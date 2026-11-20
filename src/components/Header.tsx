@@ -34,7 +34,7 @@ export function Header({
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 py-2.5">
           <button
             type="button"
-            onClick={() => onSelectSector(hasAnalysis ? 'profile' : 'entry')}
+            onClick={() => onSelectSector('entry')}
             className="flex items-baseline gap-2.5 text-left cursor-pointer"
           >
             <span className="font-display text-2xl sm:text-[26px] font-extrabold tracking-tight text-[var(--text-main)]">
