@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Check, Download, Link2, Share2 } from 'lucide-react';
+import { Check, Download, ExternalLink, Link2, Share2 } from 'lucide-react';
 import {
   type CardFormat,
   type CardTheme,
@@ -84,18 +84,49 @@ export function CardStudio({
     }
   };
 
+  const buildShareText = () => {
+    const station = periodResult.topStation.station;
+    const pct = periodResult.topStation.percentage;
+    return lang === 'pt'
+      ? `Minha rádio oficial em Leonida (GTA VI) é ${station.name} (${station.frequency}) — ${pct}% de match! 🌴📻 Descubra a sua e compare comigo:`
+      : `My official GTA VI radio station in Leonida is ${station.name} (${station.frequency}) — ${pct}% match! 🌴📻 Find yours and compare:`;
+  };
+
+  const handleShareOnX = () => {
+    const intent = new URL('https://twitter.com/intent/tweet');
+    intent.searchParams.set('text', buildShareText());
+    intent.searchParams.set('url', compareUrl);
+    window.open(intent.toString(), '_blank', 'noopener,noreferrer');
+  };
+
   const handleNativeShare = async () => {
     if (!navigator.share) {
       await handleCopyLink();
       return;
     }
+    const shareText = buildShareText();
     try {
+      if (previewUrl && navigator.canShare) {
+        const res = await fetch(previewUrl);
+        const blob = await res.blob();
+        const file = new File(
+          [blob],
+          `leonida-fm-${periodResult.topStation.station.id}-${format}.png`,
+          { type: 'image/png' }
+        );
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: `Leonida Wrapped — ${periodResult.topStation.station.name}`,
+            text: shareText,
+            url: compareUrl,
+            files: [file],
+          });
+          return;
+        }
+      }
       await navigator.share({
-        title: `Leonida FM — ${periodResult.topStation.station.name}`,
-        text:
-          lang === 'pt'
-            ? `Minha rádio oficial no GTA VI é ${periodResult.topStation.station.name}! Compare com a sua:`
-            : `My official GTA VI radio station is ${periodResult.topStation.station.name}! Compare yours:`,
+        title: `Leonida Wrapped — ${periodResult.topStation.station.name}`,
+        text: shareText,
         url: compareUrl,
       });
     } catch {
@@ -188,6 +219,15 @@ export function CardStudio({
             >
               {copiedLink ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
               <span>{copiedLink ? t.inviteFriendCopied : t.copyCompareLink}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleShareOnX}
+              className="inline-flex items-center gap-2 border border-[var(--vice-pink)]/70 bg-[var(--vice-pink)]/12 px-4 py-2.5 text-xs font-semibold text-[var(--text-main)] hover:bg-[var(--vice-pink)]/20 cursor-pointer"
+            >
+              <ExternalLink className="h-3.5 w-3.5 text-[var(--vice-pink)]" />
+              <span>{t.shareOnX}</span>
             </button>
 
             <button

@@ -64,6 +64,18 @@ export function ResultsDashboard({
     }
   };
 
+  const handleShareOnX = () => {
+    if (!compareUrl) return;
+    const text =
+      lang === 'pt'
+        ? `Minha rádio oficial em Leonida (GTA VI) é ${top.station.name} (${top.station.frequency}) — ${top.percentage}% de match! 🌴📻 Descubra a sua e compare comigo:`
+        : `My official GTA VI radio station in Leonida is ${top.station.name} (${top.station.frequency}) — ${top.percentage}% match! 🌴📻 Find yours and compare:`;
+    const intent = new URL('https://twitter.com/intent/tweet');
+    intent.searchParams.set('text', text);
+    intent.searchParams.set('url', compareUrl);
+    window.open(intent.toString(), '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <main className="mx-auto flex h-full w-full max-w-6xl flex-col px-4 sm:px-6 py-3 gap-3 min-h-0">
       {/* Top Bar: Periods + Evolution + Shortcuts */}
@@ -117,6 +129,15 @@ export function ResultsDashboard({
           >
             {copiedInvite ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
             <span>{copiedInvite ? t.inviteFriendCopied : t.inviteFriendBtn}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleShareOnX}
+            className="inline-flex items-center gap-1.5 border border-[var(--vice-pink)]/70 bg-[var(--vice-pink)]/12 px-3 py-1.5 text-xs font-semibold text-[var(--text-main)] hover:bg-[var(--vice-pink)]/20 cursor-pointer"
+          >
+            <ExternalLink className="h-3.5 w-3.5 text-[var(--vice-pink)]" />
+            <span>{t.shareOnX}</span>
           </button>
         </div>
       </div>

@@ -2,7 +2,7 @@ const LOCAL_KEY_STORAGE = 'leonida_fm_lastfm_key';
 
 export const APP_CONFIG = {
   siteName: 'LEONIDA WRAPPED',
-  siteUrl: 'leonidawrapped.com',
+  siteUrl: 'leonida-wrapped.pages.dev',
   defaultLastfmApiKey: (import.meta.env.VITE_LASTFM_API_KEY as string | undefined)?.trim() ?? '',
   youtubeApiKey: (import.meta.env.VITE_YOUTUBE_API_KEY as string | undefined)?.trim() ?? '',
   livepixUrl: (import.meta.env.VITE_LIVEPIX_URL as string | undefined)?.trim() ?? '',

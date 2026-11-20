@@ -52,13 +52,6 @@ export function Footer({ lang }: FooterProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          {APP_CONFIG.adsEnabled && (
-            <span className="hidden md:inline-flex items-center gap-1.5 border border-dashed border-[var(--border-hairline)] px-2 py-0.5 font-mono-dial text-[10px] text-[var(--text-dim)]">
-              <span className="text-[var(--vice-peach)]">{t.footerAdLabel}:</span>
-              <span>{t.footerAdText}</span>
-            </span>
-          )}
-
           <button
             type="button"
             onClick={() => setSupportOpen(true)}
