@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+:root {
+  --bg-page: #0d071a;
+  --surface: #170e2b;
+  --surface-elevated: #21153b;
+  --surface-inset: #0d071a;
+  --border-hairline: #38255c;
+  --border-strong: #543988;
+  --text-main: #fff5fa;
+  --text-muted: #bfaed4;
+  --text-dim: #8a78a8;
+  --vice-purple: #9340ff;
+  --vice-pink: #ff2e93;
+  --vice-orange: #ff7b47;
+  --vice-peach: #ffb57a;
+  --vice-blue: #00d4ff;
+  --placeholder-ink: #6e5c8a;
+  --btn-ink: #0d071a;
+}
+
+:root[data-theme='light'] {
+  --bg-page: #fdf2f8;
+  --surface: #ffffff;
+  --surface-elevated: #f8e5f2;
+  --surface-inset: #f7eaf3;
+  --border-hairline: #dfc0dd;
+  --border-strong: #c296c6;
+  --text-main: #1b0f2e;
+  --text-muted: #5d4578;
+  --text-dim: #7c6299;
+  --vice-purple: #7e22ce;
+  --vice-pink: #e11d74;
+  --vice-orange: #ea580c;
+  --vice-peach: #c2410c;
+  --vice-blue: #0284c7;
+  --placeholder-ink: #967cb0;
+  --btn-ink: #fff5fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image:
+    radial-gradient(ellipse 65% 40% at 15% 0%, rgba(147, 64, 255, 0.22), transparent 70%),
+    radial-gradient(ellipse 55% 35% at 88% 4%, rgba(255, 46, 147, 0.16), transparent 70%),
+    radial-gradient(ellipse 70% 35% at 50% 100%, rgba(0, 212, 255, 0.14), transparent 72%);
+  background-attachment: fixed;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+:root[data-theme='light'] body {
+  background-image:
+    radial-gradient(ellipse 65% 40% at 15% 0%, rgba(255, 46, 147, 0.09), transparent 70%),
+    radial-gradient(ellipse 55% 35% at 88% 6%, rgba(255, 181, 122, 0.22), transparent 70%),
+    radial-gradient(ellipse 70% 35% at 50% 100%, rgba(0, 212, 255, 0.12), transparent 72%);
+}
+
+/* Subtle analog film grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.font-display {
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: -0.015em;
+}
+
+.font-mono-dial {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.hairline {
+  border: 1px solid var(--border-hairline);
+}
+
+.hairline-b {
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.hairline-t {
+  border-top: 1px solid var(--border-hairline);
+}
+
+.gta-horizon-bar {
+  height: 3px;
+  background: linear-gradient(90deg, #9340ff 0%, #ff2e93 36%, #ff7b47 70%, #00d4ff 100%);
+}
+
+.gta-title-gradient {
+  background: linear-gradient(90deg, #ffb57a 0%, #ff2e93 52%, #00d4ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+:root[data-theme='light'] .gta-title-gradient {
+  background: linear-gradient(90deg, #9340ff 0%, #e11d74 52%, #0284c7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Crisp custom scrollbars for internal panels */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vice-pink);
+}
+
+/* Keep theme background and ink even if browser autofills inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--surface-inset) inset !important;
+  -webkit-text-fill-color: var(--text-main) !important;
+  caret-color: var(--text-main);
+  transition: background-color 5000s ease-in-out 0s;
+}
