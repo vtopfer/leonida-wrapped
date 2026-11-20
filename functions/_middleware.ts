@@ -20,7 +20,9 @@ export async function onRequest(context: {
     return context.next();
   }
 
-  const token = url.searchParams.get('r');
+  const compareToken = url.searchParams.get('compare');
+  const rToken = url.searchParams.get('r');
+  const token = compareToken || rToken;
   if (!token) {
     return context.next();
   }
@@ -47,7 +49,9 @@ export async function onRequest(context: {
     payload.a.length > 0 ? `Artistas: ${payload.a.slice(0, 4).join(', ')} • ` : '';
   const description = `${artistsText}Descubra sua rádio oficial de GTA VI e compare no Modo Carona.`;
   const ogImage = `${url.origin}/api/og?r=${encodeURIComponent(token)}`;
-  const ogUrl = `${url.origin}/?r=${encodeURIComponent(token)}`;
+  const ogUrl = compareToken
+    ? `${url.origin}/?compare=${encodeURIComponent(token)}`
+    : `${url.origin}/?r=${encodeURIComponent(token)}`;
 
   return new HTMLRewriter()
     .on('title', {
