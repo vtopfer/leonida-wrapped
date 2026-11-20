@@ -6,7 +6,7 @@ export type TimePeriod = '1month' | '6month' | 'overall';
 
 export type TalkVibe = 'conspiracy' | 'chaos' | 'hiphop_chat' | 'true_crime';
 
-export type InputSource = 'lastfm' | 'quick' | 'spotify_json' | 'demo';
+export type InputSource = 'lastfm' | 'quick' | 'spotify_json' | 'youtube_json' | 'demo';
 
 export interface LocalizedText {
   pt: string;

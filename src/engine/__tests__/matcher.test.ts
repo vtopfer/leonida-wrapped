@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEMO_PROFILES } from '../../data/demoProfiles';
 import { GTA6_STATIONS, GTA6_TALK_SHOWS } from '../../data/gta6Radios';
 import { parseSpotifyJsonArrays } from '../../services/spotifyExport';
+import { parseYoutubeTakeoutArrays } from '../../services/youtubeTakeout';
 import { selectCardHighlights } from '../cardRenderer';
 import { analyzeUserProfile, matchPeriod } from '../matcher';
 import {
@@ -206,6 +207,46 @@ describe('Spotify Local JSON History Parser', () => {
     expect(parsed.userData.periods['1month']?.tracks[0].title).toBe('Houdini');
     expect(parsed.userData.periods['6month']?.tracks).toHaveLength(2);
     expect(parsed.userData.periods.overall?.tracks).toHaveLength(3);
+  });
+});
+
+describe('YouTube Music Google Takeout Parser', () => {
+  it('filters for YouTube Music entries, cleans Topic/Watched prefixes, and buckets periods', () => {
+    const takeoutPayload = [
+      // Regular YouTube video -> ignored
+      {
+        header: 'YouTube',
+        title: 'Watched GTA 6 Trailer Analysis',
+        titleUrl: 'https://www.youtube.com/watch?v=123',
+        subtitles: [{ name: 'GameSpot' }],
+        time: '2026-11-18T12:00:00Z',
+      },
+      // Recent YT Music play (EN)
+      {
+        header: 'YouTube Music',
+        title: 'Watched Houdini',
+        titleUrl: 'https://music.youtube.com/watch?v=abc',
+        subtitles: [{ name: 'Dua Lipa - Topic' }],
+        time: '2026-11-18T14:00:00Z',
+      },
+      // Older YT Music play (PT-BR, ~90 days ago)
+      {
+        header: 'YouTube Music',
+        title: 'Assistiu a Master of Puppets',
+        titleUrl: 'https://music.youtube.com/watch?v=def',
+        subtitles: [{ name: 'Metallica - Topic' }],
+        time: '2026-08-18T18:00:00Z',
+      },
+    ];
+
+    const parsed = parseYoutubeTakeoutArrays([takeoutPayload], 'Victor');
+    expect(parsed.validPlayCount).toBe(2);
+    expect(parsed.userData.source).toBe('youtube_json');
+    expect(parsed.userData.periods['1month']?.tracks).toHaveLength(1);
+    expect(parsed.userData.periods['1month']?.tracks[0].title).toBe('Houdini');
+    expect(parsed.userData.periods['1month']?.artists[0].name).toBe('Dua Lipa');
+    expect(parsed.userData.periods['6month']?.tracks).toHaveLength(2);
+    expect(parsed.userData.periods.overall?.tracks).toHaveLength(2);
   });
 });
 

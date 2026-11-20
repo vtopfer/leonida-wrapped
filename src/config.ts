@@ -8,7 +8,7 @@ export const APP_CONFIG = {
   kofiUrl: (import.meta.env.VITE_KOFI_URL as string | undefined)?.trim() ?? '',
   pixKey: (import.meta.env.VITE_PIX_KEY as string | undefined)?.trim() ?? '',
   githubUrl: (import.meta.env.VITE_GITHUB_URL as string | undefined)?.trim() ?? '',
-  adsEnabled: (import.meta.env.VITE_ADS_ENABLED as string | undefined) !== 'false',
+  adsEnabled: (import.meta.env.VITE_ADS_ENABLED as string | undefined) === 'true',
 };
 
 export function hasEnvLastfmKey(): boolean {

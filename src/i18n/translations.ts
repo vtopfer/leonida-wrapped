@@ -33,9 +33,11 @@ export const TRANSLATIONS = {
     compareBannerPrefix: 'Comparando seu som com',
     compareBannerTop: 'Rádio #1:',
     compareBannerClear: 'Remover',
+    sourceSelectLabel: 'Escolha como conectar seu som',
     tabQuick: 'Modo Rápido',
     tabLastfm: 'Last.fm',
-    tabSpotify: 'Spotify .json',
+    tabSpotify: 'Spotify (.json)',
+    tabYoutube: 'YouTube Music (.json)',
     lastfmLabel: 'Seu usuário do Last.fm',
     lastfmPlaceholder: 'ex: seu_usuario',
     lastfmHelp:
@@ -97,6 +99,32 @@ export const TRANSLATIONS = {
     spotifyProcessing: 'Lendo histórico local...',
     spotifySuccess: 'Histórico carregado:',
     spotifyTracksSuffix: 'reproduções válidas',
+    ytDesc:
+      'Arraste o arquivo watch-history.json do Google Takeout. Filtramos automaticamente só o que você ouviu no YouTube Music — 100% local no navegador.',
+    ytTutorialBtn: '? Como baixar do YouTube Music',
+    ytTutorialTitle: 'COMO EXPORTAR SEU HISTÓRICO DO YOUTUBE MUSIC (.JSON)',
+    ytTutorialSubtitle:
+      'Sai em poucos minutos pelo Google Takeout e filtramos vídeos comuns automaticamente.',
+    ytTutorialSteps: [
+      {
+        title: '1. Abra o Google Takeout',
+        body: 'Entre em takeout.google.com e clique em "Desmarcar tudo".',
+      },
+      {
+        title: '2. Marque apenas "YouTube e YouTube Music"',
+        body: 'Clique em "Todos os dados do YouTube incluídos" → deixe marcado só "histórico" → em Formatos, troque HTML para JSON.',
+      },
+      {
+        title: '3. Baixe e extraia o .zip',
+        body: 'Abra Takeout → YouTube e YouTube Music → histórico → watch-history.json.',
+      },
+      {
+        title: '4. Arraste o watch-history.json para cá',
+        body: 'Analisamos último mês, 6 meses e histórico completo localmente, separando só músicas do YT Music.',
+      },
+    ],
+    ytTutorialOpenBtn: 'Abrir Google Takeout',
+    ytDropLabel: 'Clique ou arraste o watch-history.json do Takeout aqui',
     errors: {
       USER_NOT_FOUND: 'Usuário não encontrado no Last.fm. Confira a grafia.',
       INVALID_KEY: 'API key do Last.fm inválida.',
@@ -106,6 +134,7 @@ export const TRANSLATIONS = {
       EMPTY_DATA: 'Esse usuário ainda não tem scrobbles suficientes.',
       NETWORK: 'Erro de conexão com o Last.fm. Tente novamente.',
       SPOTIFY_PARSE: 'Não encontramos reproduções válidas nesse arquivo JSON.',
+      YOUTUBE_PARSE: 'Não encontramos faixas do YouTube Music nesse watch-history.json (verifique se exportou em JSON).',
     },
     periods: {
       '1month': 'Último mês',
@@ -202,9 +231,11 @@ export const TRANSLATIONS = {
     compareBannerPrefix: 'Comparing your sound with',
     compareBannerTop: '#1 Station:',
     compareBannerClear: 'Clear',
+    sourceSelectLabel: 'Choose how to connect your music',
     tabQuick: 'Quick Match',
     tabLastfm: 'Last.fm',
-    tabSpotify: 'Spotify .json',
+    tabSpotify: 'Spotify (.json)',
+    tabYoutube: 'YouTube Music (.json)',
     lastfmLabel: 'Your Last.fm username',
     lastfmPlaceholder: 'e.g. your_username',
     lastfmHelp:
@@ -266,6 +297,32 @@ export const TRANSLATIONS = {
     spotifyProcessing: 'Reading local history...',
     spotifySuccess: 'History loaded:',
     spotifyTracksSuffix: 'valid plays',
+    ytDesc:
+      'Drop your Google Takeout watch-history.json here. We automatically filter for YouTube Music plays only — processed 100% locally in your browser.',
+    ytTutorialBtn: '? How to export YouTube Music',
+    ytTutorialTitle: 'HOW TO EXPORT YOUR YOUTUBE MUSIC HISTORY (.JSON)',
+    ytTutorialSubtitle:
+      'Ready in a few minutes via Google Takeout — regular YouTube videos are filtered out automatically.',
+    ytTutorialSteps: [
+      {
+        title: '1. Open Google Takeout',
+        body: 'Go to takeout.google.com and click "Deselect all".',
+      },
+      {
+        title: '2. Select only "YouTube and YouTube Music"',
+        body: 'Click "All YouTube data included" → keep only "history" → under Multiple formats, switch History from HTML to JSON.',
+      },
+      {
+        title: '3. Download and unzip the archive',
+        body: 'Open Takeout → YouTube and YouTube Music → history → watch-history.json.',
+      },
+      {
+        title: '4. Drop watch-history.json here',
+        body: 'We analyze your Last 30 Days, 6 Months, and All Time locally in your browser.',
+      },
+    ],
+    ytTutorialOpenBtn: 'Open Google Takeout',
+    ytDropLabel: 'Click or drag your Takeout watch-history.json here',
     errors: {
       USER_NOT_FOUND: 'Last.fm user not found. Check spelling.',
       INVALID_KEY: 'Invalid Last.fm API key.',
@@ -275,6 +332,7 @@ export const TRANSLATIONS = {
       EMPTY_DATA: 'Not enough scrobbles on this user yet.',
       NETWORK: 'Could not reach Last.fm. Please retry.',
       SPOTIFY_PARSE: 'No valid music plays found in the selected JSON file(s).',
+      YOUTUBE_PARSE: 'No YouTube Music plays found in that watch-history.json (make sure you exported as JSON).',
     },
     periods: {
       '1month': 'Last 30 Days',

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  ChevronDown,
   FileJson,
   HelpCircle,
   KeyRound,
@@ -20,6 +21,7 @@ import { STATION_BY_INDEX } from '../data/gta6Radios';
 import { TRANSLATIONS } from '../i18n/translations';
 import { LastfmServiceError, fetchLastfmProfile } from '../services/lastfm';
 import { parseSpotifyFiles } from '../services/spotifyExport';
+import { parseYoutubeTakeoutFiles } from '../services/youtubeTakeout';
 import type { Language, MultiPeriodUserData, SharedProfileV1, TalkVibe } from '../types';
 import { QuickMatcher } from './QuickMatcher';
 import { SpotifyTutorialModal } from './SpotifyTutorialModal';
@@ -30,6 +32,8 @@ interface EntryViewProps {
   onClearChallenge: () => void;
   onComplete: (data: MultiPeriodUserData) => void;
 }
+
+type SourceOption = 'lastfm' | 'quick' | 'spotify' | 'youtube';
 
 const TALK_VIBE_KEYS: TalkVibe[] = ['conspiracy', 'chaos', 'hiphop_chat', 'true_crime'];
 
@@ -43,7 +47,7 @@ export function EntryView({
   const envHasKey = hasEnvLastfmKey();
   const initialHasKey = Boolean(getEffectiveLastfmApiKey());
 
-  const [activeTab, setActiveTab] = useState<'quick' | 'lastfm' | 'spotify'>(() =>
+  const [source, setSource] = useState<SourceOption>(() =>
     initialHasKey ? 'lastfm' : 'quick'
   );
   const [username, setUsername] = useState('');
@@ -61,9 +65,9 @@ export function EntryView({
     }
   }, [envHasKey]);
 
-  const [spotifyName, setSpotifyName] = useState('');
-  const [spotifyStatus, setSpotifyStatus] = useState<string | null>(null);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [importName, setImportName] = useState('');
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [tutorialMode, setTutorialMode] = useState<'spotify' | 'youtube' | null>(null);
 
   const friendTopStation = friendChallenge
     ? STATION_BY_INDEX.get(friendChallenge.r[0][0])
@@ -110,23 +114,33 @@ export function EntryView({
     }
   };
 
-  const handleSpotifyUpload = async (fileList: FileList | null) => {
+  const handleFileImport = async (fileList: FileList | null, kind: 'spotify' | 'youtube') => {
     if (!fileList || fileList.length === 0) return;
-    setSpotifyStatus(t.spotifyProcessing);
+    setImportStatus(t.spotifyProcessing);
     setErrorCode(null);
     try {
-      const parsed = await parseSpotifyFiles(
-        Array.from(fileList),
-        spotifyName || 'Spotify',
-        talkVibe
-      );
-      setSpotifyStatus(`${t.spotifySuccess} ${parsed.validPlayCount} ${t.spotifyTracksSuffix}`);
+      const parsed =
+        kind === 'spotify'
+          ? await parseSpotifyFiles(Array.from(fileList), importName || 'Spotify', talkVibe)
+          : await parseYoutubeTakeoutFiles(
+              Array.from(fileList),
+              importName || 'YT Music',
+              talkVibe
+            );
+      setImportStatus(`${t.spotifySuccess} ${parsed.validPlayCount} ${t.spotifyTracksSuffix}`);
       onComplete(parsed.userData);
     } catch {
-      setSpotifyStatus(null);
-      setErrorCode('SPOTIFY_PARSE');
+      setImportStatus(null);
+      setErrorCode(kind === 'spotify' ? 'SPOTIFY_PARSE' : 'YOUTUBE_PARSE');
     }
   };
+
+  const sourceOptions: Array<{ id: SourceOption; label: string }> = [
+    { id: 'lastfm', label: t.tabLastfm },
+    { id: 'quick', label: t.tabQuick },
+    { id: 'spotify', label: t.tabSpotify },
+    { id: 'youtube', label: t.tabYoutube },
+  ];
 
   return (
     <main className="mx-auto flex h-full w-full max-w-6xl flex-col justify-center px-4 sm:px-6 py-3 min-h-0">
@@ -204,52 +218,33 @@ export function EntryView({
           </div>
         </div>
 
-        {/* Right Column: Compact Single-Screen Match Console */}
+        {/* Right Column: Unified Single-Box Source Switcher */}
         <section className="lg:col-span-7 border border-[var(--border-hairline)] bg-[var(--surface)]/95 flex flex-col">
-          {/* 3 Input Tabs */}
-          <div className="grid grid-cols-3 hairline-b">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('quick');
-                setErrorCode(null);
-              }}
-              className={`px-3 py-3 text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
-                activeTab === 'quick'
-                  ? 'bg-[var(--surface-elevated)] text-[var(--text-main)] border-b-2 border-[var(--vice-pink)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-            >
-              {t.tabQuick}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('lastfm');
-                setErrorCode(null);
-              }}
-              className={`px-3 py-3 text-xs sm:text-sm font-semibold border-l border-[var(--border-hairline)] transition-colors cursor-pointer ${
-                activeTab === 'lastfm'
-                  ? 'bg-[var(--surface-elevated)] text-[var(--text-main)] border-b-2 border-[var(--vice-purple)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-            >
-              {t.tabLastfm}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab('spotify');
-                setErrorCode(null);
-              }}
-              className={`px-3 py-3 text-xs sm:text-sm font-semibold border-l border-[var(--border-hairline)] transition-colors cursor-pointer ${
-                activeTab === 'spotify'
-                  ? 'bg-[var(--surface-elevated)] text-[var(--text-main)] border-b-2 border-[var(--vice-blue)]'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
-              }`}
-            >
-              {t.tabSpotify}
-            </button>
+          {/* Unified Source Bar (1 clean selector row) */}
+          <div className="hairline-b bg-[var(--surface-elevated)]/70 px-4 sm:px-5 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <span className="font-mono-dial text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
+              {t.sourceSelectLabel}
+            </span>
+
+            <div className="relative">
+              <select
+                aria-label={t.sourceSelectLabel}
+                value={source}
+                onChange={(e) => {
+                  setSource(e.target.value as SourceOption);
+                  setErrorCode(null);
+                  setImportStatus(null);
+                }}
+                className="w-full sm:w-auto appearance-none border border-[var(--vice-pink)] bg-[var(--surface-inset)] pl-3.5 pr-9 py-2 text-xs sm:text-sm font-bold text-[var(--text-main)] outline-none focus:border-[var(--vice-blue)] cursor-pointer"
+              >
+                {sourceOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--vice-pink)]" />
+            </div>
           </div>
 
           <div className="p-4 sm:p-5 space-y-4">
@@ -283,7 +278,7 @@ export function EntryView({
               </div>
             )}
 
-            {activeTab === 'quick' && (
+            {source === 'quick' && (
               <QuickMatcher
                 lang={lang}
                 talkVibe={talkVibe}
@@ -291,7 +286,7 @@ export function EntryView({
               />
             )}
 
-            {activeTab === 'lastfm' && (
+            {source === 'lastfm' && (
               <div className="space-y-4 py-2">
                 <form onSubmit={handleLastfmSubmit} autoComplete="off" className="space-y-2.5">
                   <label
@@ -378,29 +373,37 @@ export function EntryView({
               </div>
             )}
 
-            {activeTab === 'spotify' && (
+            {(source === 'spotify' || source === 'youtube') && (
               <div className="space-y-3 py-1">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--vice-blue)]">
                     <FileJson className="h-4 w-4" />
-                    <span>Spotify StreamingHistory (.json)</span>
+                    <span>
+                      {source === 'spotify'
+                        ? 'Spotify StreamingHistory (.json)'
+                        : 'YouTube Music — Google Takeout (.json)'}
+                    </span>
                   </span>
                   <button
                     type="button"
-                    onClick={() => setTutorialOpen(true)}
+                    onClick={() => setTutorialMode(source)}
                     className="inline-flex items-center gap-1 border border-[var(--vice-blue)]/50 bg-[var(--vice-blue)]/10 px-2.5 py-1 text-[11px] font-semibold text-[var(--vice-blue)] hover:bg-[var(--vice-blue)]/20 cursor-pointer"
                   >
                     <HelpCircle className="h-3.5 w-3.5" />
-                    <span>{t.spotifyTutorialBtn}</span>
+                    <span>
+                      {source === 'spotify' ? t.spotifyTutorialBtn : t.ytTutorialBtn}
+                    </span>
                   </button>
                 </div>
 
-                <p className="text-xs leading-relaxed text-[var(--text-muted)]">{t.spotifyDesc}</p>
+                <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+                  {source === 'spotify' ? t.spotifyDesc : t.ytDesc}
+                </p>
 
                 <input
                   type="text"
-                  value={spotifyName}
-                  onChange={(e) => setSpotifyName(e.target.value)}
+                  value={importName}
+                  onChange={(e) => setImportName(e.target.value)}
                   maxLength={28}
                   placeholder={t.quickNamePlaceholder}
                   className="w-full border border-[var(--border-hairline)] bg-[var(--surface-inset)] px-3 py-2 text-xs text-[var(--text-main)] placeholder-[var(--placeholder-ink)] outline-none focus:border-[var(--vice-blue)]"
@@ -409,20 +412,20 @@ export function EntryView({
                 <label className="flex flex-col items-center justify-center gap-2 border border-dashed border-[var(--border-strong)] bg-[var(--surface-inset)]/75 px-4 py-6 text-center transition-colors hover:border-[var(--vice-blue)] cursor-pointer">
                   <Upload className="h-4 w-4 text-[var(--vice-blue)]" />
                   <span className="text-xs font-semibold text-[var(--text-main)]">
-                    {t.spotifyDropLabel}
+                    {source === 'spotify' ? t.spotifyDropLabel : t.ytDropLabel}
                   </span>
                   <input
                     type="file"
                     accept=".json,application/json"
                     multiple
-                    onChange={(e) => handleSpotifyUpload(e.target.files)}
+                    onChange={(e) => handleFileImport(e.target.files, source)}
                     className="hidden"
                   />
                 </label>
 
-                {spotifyStatus && (
+                {importStatus && (
                   <p className="font-mono-dial text-[11px] text-[var(--vice-blue)]">
-                    {spotifyStatus}
+                    {importStatus}
                   </p>
                 )}
               </div>
@@ -433,8 +436,9 @@ export function EntryView({
 
       <SpotifyTutorialModal
         lang={lang}
-        isOpen={tutorialOpen}
-        onClose={() => setTutorialOpen(false)}
+        mode={tutorialMode ?? 'spotify'}
+        isOpen={tutorialMode !== null}
+        onClose={() => setTutorialMode(null)}
       />
     </main>
   );
