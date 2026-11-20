@@ -1,14 +1,19 @@
 import { ImageResponse } from 'workers-og';
 import { STATION_BY_INDEX } from '../../src/data/gta6Radios';
 import { decodeSharedProfile } from '../../src/engine/share';
+import { getStationArtworkSvg } from '../../src/engine/stationSvg';
 
 function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function svgToDataUri(svg: string): string {
+  const bytes = new TextEncoder().encode(svg);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 1) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return `data:image/svg+xml;base64,${btoa(binary)}`;
 }
 
 export async function onRequest(context: { request: Request }): Promise<Response> {
@@ -53,6 +58,8 @@ export async function onRequest(context: { request: Request }): Promise<Response
   const [topIdx, topPct] = payload.r[0];
   const topStation = STATION_BY_INDEX.get(topIdx);
   const accent = topStation?.accentColor ?? '#FF5C77';
+  const stationId = topStation?.id ?? 'flash-fm';
+  const stationArtUri = svgToDataUri(getStationArtworkSvg(stationId, 'og'));
   const stationName = escapeHtml(topStation?.name ?? 'Flash FM');
   const frequency = escapeHtml(topStation?.frequency ?? '98.7 MHz');
   const hosts = escapeHtml(topStation?.hosts ?? '');
@@ -72,13 +79,15 @@ export async function onRequest(context: { request: Request }): Promise<Response
     .map(([idx, pct], i) => {
       const st = STATION_BY_INDEX.get(idx);
       if (!st) return '';
+      const miniArtUri = svgToDataUri(getStationArtworkSvg(st.id, `og-${i}`));
       return `
-        <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); padding: 12px 18px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); padding: 10px 16px; margin-bottom: 12px;">
           <div style="display: flex; align-items: center;">
-            <div style="display: flex; font-size: 18px; color: #9c8bb4; margin-right: 14px; font-weight: 700;">0${i + 2}</div>
-            <div style="display: flex; font-size: 22px; color: #f4efe6; font-weight: 700;">${escapeHtml(st.name)}</div>
+            <img src="${miniArtUri}" width="36" height="36" style="display: flex; margin-right: 12px; border: 1px solid rgba(255,255,255,0.2);" />
+            <div style="display: flex; font-size: 17px; color: #9c8bb4; margin-right: 10px; font-weight: 700;">0${i + 2}</div>
+            <div style="display: flex; font-size: 21px; color: #f4efe6; font-weight: 700;">${escapeHtml(st.name)}</div>
           </div>
-          <div style="display: flex; font-size: 22px; color: ${st.accentColor}; font-weight: 800;">${pct}%</div>
+          <div style="display: flex; font-size: 21px; color: ${st.accentColor}; font-weight: 800;">${pct}%</div>
         </div>
       `;
     })
@@ -95,38 +104,41 @@ export async function onRequest(context: { request: Request }): Promise<Response
         </div>
       </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: stretch; margin-top: 20px;">
-        <div style="display: flex; flex-direction: column; justify-content: center; width: 690px; padding-right: 32px;">
-          <div style="display: flex; align-items: center; margin-bottom: 10px;">
-            <div style="display: flex; border: 1px solid ${accent}; color: ${accent}; padding: 4px 12px; font-size: 18px; font-weight: 700; margin-right: 14px;">
-              ${frequency}
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+        <div style="display: flex; align-items: center; width: 690px; padding-right: 28px;">
+          <img src="${stationArtUri}" width="176" height="176" style="display: flex; border: 3px solid ${accent}; margin-right: 28px;" />
+          <div style="display: flex; flex-direction: column; justify-content: center;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+              <div style="display: flex; border: 1px solid ${accent}; color: ${accent}; padding: 4px 12px; font-size: 18px; font-weight: 700; margin-right: 12px;">
+                ${frequency}
+              </div>
+              <div style="display: flex; font-size: 19px; color: #2cd9c5; font-weight: 700;">
+                ${personaTitle}
+              </div>
             </div>
-            <div style="display: flex; font-size: 20px; color: #2cd9c5; font-weight: 700;">
-              ${personaTitle}
-            </div>
-          </div>
 
-          <div style="display: flex; font-size: 64px; font-weight: 800; color: #ffffff; line-height: 1.05;">
-            ${stationName}
-          </div>
-
-          <div style="display: flex; align-items: baseline; margin-top: 14px;">
-            <div style="display: flex; font-size: 72px; font-weight: 800; color: ${accent}; line-height: 1;">
-              ${topPct}%
+            <div style="display: flex; font-size: 54px; font-weight: 800; color: #ffffff; line-height: 1.05;">
+              ${stationName}
             </div>
-            <div style="display: flex; font-size: 24px; color: #c4b5d8; margin-left: 16px; font-weight: 600;">
-              de match musical
-            </div>
-          </div>
 
-          ${
-            hosts
-              ? `<div style="display: flex; font-size: 20px; color: #a796bf; margin-top: 14px;">Apresentação: ${hosts}</div>`
-              : ''
-          }
+            <div style="display: flex; align-items: baseline; margin-top: 10px;">
+              <div style="display: flex; font-size: 62px; font-weight: 800; color: ${accent}; line-height: 1;">
+                ${topPct}%
+              </div>
+              <div style="display: flex; font-size: 22px; color: #c4b5d8; margin-left: 14px; font-weight: 600;">
+                de match musical
+              </div>
+            </div>
+
+            ${
+              hosts
+                ? `<div style="display: flex; font-size: 18px; color: #a796bf; margin-top: 10px;">Apresentação: ${hosts}</div>`
+                : ''
+            }
+          </div>
         </div>
 
-        <div style="display: flex; flex-direction: column; justify-content: center; width: 390px;">
+        <div style="display: flex; flex-direction: column; justify-content: center; width: 394px;">
           <div style="display: flex; font-size: 16px; letter-spacing: 2px; color: #9c8bb4; font-weight: 700; margin-bottom: 12px;">
             OUTRAS RÁDIOS NO RADAR
           </div>
