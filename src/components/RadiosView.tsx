@@ -280,22 +280,22 @@ export function RadiosView({ lang, initialStationId }: RadiosViewProps) {
                 </div>
 
                 {previewTrack && (
-                  <div className="pt-0.5">
-                    <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-wider text-[#fff5fa] leading-tight">
+                  <div className="pt-0.5 max-w-lg mx-auto">
+                    <p className="font-display text-xl sm:text-2xl font-bold uppercase tracking-wider text-[#fff5fa] leading-tight truncate">
                       {previewTrack.title}
                     </p>
-                    <p className="font-display text-base sm:text-lg font-semibold uppercase tracking-widest text-[#bfaed4]">
+                    <p className="font-display text-base sm:text-lg font-semibold uppercase tracking-widest text-[#bfaed4] truncate">
                       {previewTrack.artist}
                     </p>
                   </div>
                 )}
 
-                <p className="pt-1 font-mono-dial text-[11px] text-[#ffb57a]">
+                <p className="pt-1 font-mono-dial text-[11px] text-[#ffb57a] truncate max-w-xl mx-auto">
                   {activeMusicStation.frequency} • {t.heroHostPrefix} {activeMusicStation.hosts}
                 </p>
 
                 {!showTracklist && (
-                  <p className="mx-auto max-w-xl pt-1.5 text-xs text-[#bfaed4]/85">
+                  <p className="mx-auto max-w-2xl pt-1.5 text-xs text-[#bfaed4]/85 min-h-[2.5rem] line-clamp-2">
                     {activeMusicStation.description[lang]}
                   </p>
                 )}
@@ -313,7 +313,7 @@ export function RadiosView({ lang, initialStationId }: RadiosViewProps) {
                 <p className="font-display text-lg font-semibold uppercase tracking-wider text-[#ffb57a]">
                   {activeTalkShow.hosts}
                 </p>
-                <p className="mx-auto max-w-xl text-xs text-[#bfaed4]">
+                <p className="mx-auto max-w-2xl text-xs text-[#bfaed4] min-h-[2.25rem] line-clamp-2">
                   {activeTalkShow.description[lang]}
                 </p>
               </div>
