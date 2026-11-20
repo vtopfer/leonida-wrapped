@@ -6,20 +6,6 @@ function escapeHtml(text: string): string {
   return text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function getStationMonogram(name: string): string {
-  const clean = name.replace(/[^A-Za-z0-9 ]/g, '').trim();
-  const words = clean.split(/\s+/).filter(Boolean);
-  if (words.length === 1) return words[0].slice(0, 4).toUpperCase();
-  if (words[0].length <= 4 && words[0].toUpperCase() === words[0]) {
-    return words[0].slice(0, 4);
-  }
-  return words
-    .slice(0, 3)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase();
-}
-
 export async function onRequest(context: { request: Request }): Promise<Response> {
   const url = new URL(context.request.url);
   const token = url.searchParams.get('r') ?? '';
@@ -62,13 +48,14 @@ export async function onRequest(context: { request: Request }): Promise<Response
   const [topIdx, topPct] = payload.r[0];
   const topStation = STATION_BY_INDEX.get(topIdx);
   const accent = topStation?.accentColor ?? '#FF5C77';
+  const stationId = topStation?.id ?? 'flash-fm';
+  const stationArtUrl = `${url.origin}/stations/${stationId}.png`;
   const rawStationName = topStation?.name ?? 'Flash FM';
   const stationName = escapeHtml(rawStationName);
   const frequency = escapeHtml(topStation?.frequency ?? '98.7 MHz');
   const hosts = escapeHtml(topStation?.hosts ?? '');
   const personaTitle = escapeHtml(topStation?.persona.pt.title ?? 'Sintonia Oficial');
   const userName = escapeHtml(payload.n || 'Amigo');
-  const badgeFontSize = rawStationName.length > 16 ? 22 : rawStationName.length > 10 ? 27 : 34;
 
   const artistChips = payload.a
     .slice(0, 5)
@@ -83,13 +70,11 @@ export async function onRequest(context: { request: Request }): Promise<Response
     .map(([idx, pct], i) => {
       const st = STATION_BY_INDEX.get(idx);
       if (!st) return '';
-      const mono = escapeHtml(getStationMonogram(st.name));
+      const miniArtUrl = `${url.origin}/stations/${st.id}.png`;
       return `
         <div style="display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); padding: 10px 16px; margin-bottom: 12px;">
           <div style="display: flex; align-items: center;">
-            <div style="display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border: 2px solid ${st.accentColor}; background: linear-gradient(135deg, #160c28 0%, #241342 100%); color: #ffffff; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; margin-right: 12px;">
-              ${mono}
-            </div>
+            <img src="${miniArtUrl}" width="42" height="42" style="display: flex; border: 1px solid rgba(255,255,255,0.2); margin-right: 12px;" />
             <div style="display: flex; font-size: 17px; color: #9c8bb4; margin-right: 10px; font-weight: 700;">0${i + 2}</div>
             <div style="display: flex; font-size: 21px; color: #f4efe6; font-weight: 700;">${escapeHtml(st.name)}</div>
           </div>
@@ -112,16 +97,7 @@ export async function onRequest(context: { request: Request }): Promise<Response
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
         <div style="display: flex; align-items: center; width: 690px; padding-right: 28px;">
-          <div style="display: flex; flex-direction: column; justify-content: space-between; width: 182px; height: 182px; border: 3px solid ${accent}; background: linear-gradient(145deg, #170d2c 0%, #2a1447 100%); padding: 14px; margin-right: 28px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div style="display: flex; font-size: 13px; color: ${accent}; font-weight: 800; letter-spacing: 1px;">FM</div>
-              <div style="display: flex; font-size: 13px; color: #c4b5d8; font-weight: 700;">${frequency}</div>
-            </div>
-            <div style="display: flex; align-items: center; justify-content: center; text-align: center; font-size: ${badgeFontSize}px; font-weight: 900; color: #ffffff; line-height: 1.05; text-transform: uppercase;">
-              ${stationName}
-            </div>
-            <div style="display: flex; width: 100%; height: 6px; background: ${accent};"></div>
-          </div>
+          <img src="${stationArtUrl}" width="182" height="182" style="display: flex; border: 3px solid ${accent}; margin-right: 28px;" />
 
           <div style="display: flex; flex-direction: column; justify-content: center;">
             <div style="display: flex; align-items: center; margin-bottom: 10px;">
