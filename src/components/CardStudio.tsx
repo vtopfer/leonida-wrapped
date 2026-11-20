@@ -86,10 +86,9 @@ export function CardStudio({
 
   const buildShareText = () => {
     const station = periodResult.topStation.station;
-    const pct = periodResult.topStation.percentage;
     return lang === 'pt'
-      ? `Minha rádio oficial em Leonida (GTA VI) é ${station.name} (${station.frequency}) — ${pct}% de match! 🌴📻 Descubra a sua e compare comigo:\n\n#wrapped #gtavi #gta6 #leonidawrapped`
-      : `My official GTA VI radio station in Leonida is ${station.name} (${station.frequency}) — ${pct}% match! 🌴📻 Find yours and compare:\n\n#wrapped #gtavi #gta6 #leonidawrapped`;
+      ? `Minha rádio oficial em Leonida (GTA VI) é ${station.name} (${station.frequency}) — Leonida Wrapped\n\n#wrapped #gtavi #gta6 #leonidawrapped`
+      : `My official GTA VI radio station in Leonida is ${station.name} (${station.frequency}) — Leonida Wrapped\n\n#wrapped #gtavi #gta6 #leonidawrapped`;
   };
 
   const handleShareOnX = () => {
