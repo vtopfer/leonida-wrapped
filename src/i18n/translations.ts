@@ -37,7 +37,7 @@ export const TRANSLATIONS = {
     tabQuick: 'Modo Rápido',
     tabLastfm: 'Last.fm',
     tabSpotify: 'Spotify (.json)',
-    tabYoutube: 'YouTube Music (.json)',
+    tabYoutube: 'YouTube Music',
     lastfmLabel: 'Seu usuário do Last.fm',
     lastfmPlaceholder: 'ex: seu_usuario',
     lastfmHelp:
@@ -99,6 +99,11 @@ export const TRANSLATIONS = {
     spotifyProcessing: 'Lendo histórico local...',
     spotifySuccess: 'Histórico carregado:',
     spotifyTracksSuffix: 'reproduções válidas',
+    ytPublicLabel: 'Link da playlist pública ou @canal do YouTube / YT Music',
+    ytPublicPlaceholder: 'ex: music.youtube.com/playlist?list=... ou @seucanal',
+    ytPublicHelp:
+      'Suas playlists precisam estar como Públicas ou Não listadas. Sem login e sem baixar arquivos.',
+    ytTakeoutToggle: 'Quer por período (1 mês / 6 meses / sempre)? Importar watch-history.json do Takeout',
     ytDesc:
       'Arraste o arquivo watch-history.json do Google Takeout. Filtramos automaticamente só o que você ouviu no YouTube Music — 100% local no navegador.',
     ytTutorialBtn: '? Como baixar do YouTube Music',
@@ -135,6 +140,11 @@ export const TRANSLATIONS = {
       NETWORK: 'Erro de conexão com o Last.fm. Tente novamente.',
       SPOTIFY_PARSE: 'Não encontramos reproduções válidas nesse arquivo JSON.',
       YOUTUBE_PARSE: 'Não encontramos faixas do YouTube Music nesse watch-history.json (verifique se exportou em JSON).',
+      YOUTUBE_INVALID_INPUT: 'Cole um link válido de playlist pública, canal ou @usuario do YouTube / YT Music.',
+      YOUTUBE_NO_PUBLIC_PLAYLISTS: 'Nenhuma playlist pública ou música encontrada nesse link/canal. Confira se a playlist não está Privada.',
+      YOUTUBE_KEY_INVALID: 'Chave da API do YouTube inválida ou restrita.',
+      YOUTUBE_QUOTA: 'Cota diária gratuita da API do YouTube atingida. Use o Modo Rápido ou o .json do Takeout.',
+      YOUTUBE_MISSING_KEY: 'Chave do YouTube não configurada neste ambiente — use o .json do Takeout abaixo.',
     },
     periods: {
       '1month': 'Último mês',
@@ -235,7 +245,7 @@ export const TRANSLATIONS = {
     tabQuick: 'Quick Match',
     tabLastfm: 'Last.fm',
     tabSpotify: 'Spotify (.json)',
-    tabYoutube: 'YouTube Music (.json)',
+    tabYoutube: 'YouTube Music',
     lastfmLabel: 'Your Last.fm username',
     lastfmPlaceholder: 'e.g. your_username',
     lastfmHelp:
@@ -297,6 +307,11 @@ export const TRANSLATIONS = {
     spotifyProcessing: 'Reading local history...',
     spotifySuccess: 'History loaded:',
     spotifyTracksSuffix: 'valid plays',
+    ytPublicLabel: 'Public playlist URL or @handle (YouTube / YT Music)',
+    ytPublicPlaceholder: 'e.g. music.youtube.com/playlist?list=... or @yourhandle',
+    ytPublicHelp:
+      'Playlists must be Public or Unlisted. Zero login and no file exports needed.',
+    ytTakeoutToggle: 'Want 1m / 6m / All-Time history? Import Takeout watch-history.json',
     ytDesc:
       'Drop your Google Takeout watch-history.json here. We automatically filter for YouTube Music plays only — processed 100% locally in your browser.',
     ytTutorialBtn: '? How to export YouTube Music',
@@ -333,6 +348,11 @@ export const TRANSLATIONS = {
       NETWORK: 'Could not reach Last.fm. Please retry.',
       SPOTIFY_PARSE: 'No valid music plays found in the selected JSON file(s).',
       YOUTUBE_PARSE: 'No YouTube Music plays found in that watch-history.json (make sure you exported as JSON).',
+      YOUTUBE_INVALID_INPUT: 'Paste a valid YouTube / YT Music playlist URL, channel URL, or @handle.',
+      YOUTUBE_NO_PUBLIC_PLAYLISTS: 'No public playlists or tracks found for that URL/channel. Make sure the playlist is not Private.',
+      YOUTUBE_KEY_INVALID: 'YouTube API key is invalid or restricted.',
+      YOUTUBE_QUOTA: 'Daily free YouTube API quota reached. Use Quick Match or Takeout .json.',
+      YOUTUBE_MISSING_KEY: 'YouTube API key not configured here — use Takeout .json below.',
     },
     periods: {
       '1month': 'Last 30 Days',

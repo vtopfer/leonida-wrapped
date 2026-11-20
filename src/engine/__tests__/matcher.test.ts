@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { DEMO_PROFILES } from '../../data/demoProfiles';
 import { GTA6_STATIONS, GTA6_TALK_SHOWS } from '../../data/gta6Radios';
 import { parseSpotifyJsonArrays } from '../../services/spotifyExport';
+import {
+  extractYoutubeArtistAndTitle,
+  parseYoutubeInput,
+} from '../../services/youtubePublic';
 import { parseYoutubeTakeoutArrays } from '../../services/youtubeTakeout';
 import { selectCardHighlights } from '../cardRenderer';
 import { analyzeUserProfile, matchPeriod } from '../matcher';
@@ -287,5 +291,42 @@ describe('Stateless Friend Share & Comparison', () => {
     expect(comparison.sharedArtists).toContain('Tame Impala');
     expect(comparison.sharedTracks).toContain('Dua Lipa - Houdini');
     expect(comparison.roadtripStation.name).toBeTruthy();
+  });
+});
+
+describe('YouTube Public Playlist / Channel Parser', () => {
+  it('parses playlist URLs, @handles, and UC channel IDs', () => {
+    expect(
+      parseYoutubeInput('https://music.youtube.com/playlist?list=PL1234567890_abc')
+    ).toEqual({ kind: 'playlist', id: 'PL1234567890_abc' });
+
+    expect(
+      parseYoutubeInput('https://www.youtube.com/@seucanal')
+    ).toEqual({ kind: 'handle', handle: '@seucanal' });
+
+    expect(
+      parseYoutubeInput('@victortopfer')
+    ).toEqual({ kind: 'handle', handle: '@victortopfer' });
+
+    expect(
+      parseYoutubeInput('https://music.youtube.com/channel/UC1234567890abcdef123456')
+    ).toEqual({ kind: 'channel_id', id: 'UC1234567890abcdef123456' });
+  });
+
+  it('extracts artist and song title from Topic channels and Official Video titles', () => {
+    expect(extractYoutubeArtistAndTitle('Houdini', 'Dua Lipa - Topic')).toEqual({
+      artist: 'Dua Lipa',
+      title: 'Houdini',
+    });
+
+    expect(
+      extractYoutubeArtistAndTitle(
+        'Metallica - Master of Puppets (Official Music Video)',
+        'Metallica'
+      )
+    ).toEqual({
+      artist: 'Metallica',
+      title: 'Master of Puppets',
+    });
   });
 });

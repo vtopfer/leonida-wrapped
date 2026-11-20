@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import {
+  APP_CONFIG,
   getEffectiveLastfmApiKey,
   hasEnvLastfmKey,
   hasUserCustomLastfmKey,
@@ -21,6 +22,7 @@ import { STATION_BY_INDEX } from '../data/gta6Radios';
 import { TRANSLATIONS } from '../i18n/translations';
 import { LastfmServiceError, fetchLastfmProfile } from '../services/lastfm';
 import { parseSpotifyFiles } from '../services/spotifyExport';
+import { YoutubeServiceError, fetchYoutubePublicProfile } from '../services/youtubePublic';
 import { parseYoutubeTakeoutFiles } from '../services/youtubeTakeout';
 import type { Language, MultiPeriodUserData, SharedProfileV1, TalkVibe } from '../types';
 import { QuickMatcher } from './QuickMatcher';
@@ -68,6 +70,8 @@ export function EntryView({
   const [importName, setImportName] = useState('');
   const [importStatus, setImportStatus] = useState<string | null>(null);
   const [tutorialMode, setTutorialMode] = useState<'spotify' | 'youtube' | null>(null);
+  const [ytInput, setYtInput] = useState('');
+  const [showYtTakeout, setShowYtTakeout] = useState(false);
 
   const friendTopStation = friendChallenge
     ? STATION_BY_INDEX.get(friendChallenge.r[0][0])
@@ -105,6 +109,28 @@ export function EntryView({
       onComplete(profile);
     } catch (err) {
       if (err instanceof LastfmServiceError) {
+        setErrorCode(err.code);
+      } else {
+        setErrorCode('NETWORK');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleYoutubePublicSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorCode(null);
+    try {
+      const profile = await fetchYoutubePublicProfile(
+        ytInput,
+        APP_CONFIG.youtubeApiKey,
+        talkVibe
+      );
+      onComplete(profile);
+    } catch (err) {
+      if (err instanceof YoutubeServiceError) {
         setErrorCode(err.code);
       } else {
         setErrorCode('NETWORK');
@@ -373,31 +399,25 @@ export function EntryView({
               </div>
             )}
 
-            {(source === 'spotify' || source === 'youtube') && (
+            {source === 'spotify' && (
               <div className="space-y-3 py-1">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--vice-blue)]">
                     <FileJson className="h-4 w-4" />
-                    <span>
-                      {source === 'spotify'
-                        ? 'Spotify StreamingHistory (.json)'
-                        : 'YouTube Music — Google Takeout (.json)'}
-                    </span>
+                    <span>Spotify StreamingHistory (.json)</span>
                   </span>
                   <button
                     type="button"
-                    onClick={() => setTutorialMode(source)}
+                    onClick={() => setTutorialMode('spotify')}
                     className="inline-flex items-center gap-1 border border-[var(--vice-blue)]/50 bg-[var(--vice-blue)]/10 px-2.5 py-1 text-[11px] font-semibold text-[var(--vice-blue)] hover:bg-[var(--vice-blue)]/20 cursor-pointer"
                   >
                     <HelpCircle className="h-3.5 w-3.5" />
-                    <span>
-                      {source === 'spotify' ? t.spotifyTutorialBtn : t.ytTutorialBtn}
-                    </span>
+                    <span>{t.spotifyTutorialBtn}</span>
                   </button>
                 </div>
 
                 <p className="text-xs leading-relaxed text-[var(--text-muted)]">
-                  {source === 'spotify' ? t.spotifyDesc : t.ytDesc}
+                  {t.spotifyDesc}
                 </p>
 
                 <input
@@ -412,13 +432,13 @@ export function EntryView({
                 <label className="flex flex-col items-center justify-center gap-2 border border-dashed border-[var(--border-strong)] bg-[var(--surface-inset)]/75 px-4 py-6 text-center transition-colors hover:border-[var(--vice-blue)] cursor-pointer">
                   <Upload className="h-4 w-4 text-[var(--vice-blue)]" />
                   <span className="text-xs font-semibold text-[var(--text-main)]">
-                    {source === 'spotify' ? t.spotifyDropLabel : t.ytDropLabel}
+                    {t.spotifyDropLabel}
                   </span>
                   <input
                     type="file"
                     accept=".json,application/json"
                     multiple
-                    onChange={(e) => handleFileImport(e.target.files, source)}
+                    onChange={(e) => handleFileImport(e.target.files, 'spotify')}
                     className="hidden"
                   />
                 </label>
@@ -428,6 +448,107 @@ export function EntryView({
                     {importStatus}
                   </p>
                 )}
+              </div>
+            )}
+
+            {source === 'youtube' && (
+              <div className="space-y-4 py-2">
+                <form onSubmit={handleYoutubePublicSubmit} autoComplete="off" className="space-y-2.5">
+                  <label
+                    htmlFor="yt-public-input"
+                    className="block text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]"
+                  >
+                    {t.ytPublicLabel}
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      id="yt-public-input"
+                      name="yt_public_input"
+                      type="text"
+                      autoComplete="off"
+                      value={ytInput}
+                      onChange={(e) => setYtInput(e.target.value)}
+                      placeholder={t.ytPublicPlaceholder}
+                      className="flex-1 border border-[var(--border-hairline)] bg-[var(--surface-inset)] px-3.5 py-2.5 text-sm text-[var(--text-main)] placeholder-[var(--placeholder-ink)] outline-none focus:border-[var(--vice-blue)]"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading || !ytInput.trim()}
+                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#9340ff] to-[#ff2e93] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
+                    >
+                      <Radio className="h-3.5 w-3.5" />
+                      <span>{loading ? t.lastfmLoading : t.lastfmSubmit}</span>
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-[var(--text-muted)]">{t.ytPublicHelp}</p>
+                </form>
+
+                <div className="border-t border-[var(--border-hairline)] pt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowYtTakeout((prev) => !prev)}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--text-muted)] hover:text-[var(--vice-blue)] cursor-pointer"
+                  >
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform ${
+                        showYtTakeout ? 'rotate-180' : ''
+                      }`}
+                    />
+                    <span>{t.ytTakeoutToggle}</span>
+                  </button>
+
+                  {showYtTakeout && (
+                    <div className="mt-3 space-y-3 border border-[var(--border-hairline)] bg-[var(--surface-inset)]/60 p-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--vice-blue)]">
+                          <FileJson className="h-4 w-4" />
+                          <span>YouTube Music — Google Takeout (.json)</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setTutorialMode('youtube')}
+                          className="inline-flex items-center gap-1 border border-[var(--vice-blue)]/50 bg-[var(--vice-blue)]/10 px-2.5 py-1 text-[11px] font-semibold text-[var(--vice-blue)] hover:bg-[var(--vice-blue)]/20 cursor-pointer"
+                        >
+                          <HelpCircle className="h-3.5 w-3.5" />
+                          <span>{t.ytTutorialBtn}</span>
+                        </button>
+                      </div>
+
+                      <p className="text-xs leading-relaxed text-[var(--text-muted)]">
+                        {t.ytDesc}
+                      </p>
+
+                      <input
+                        type="text"
+                        value={importName}
+                        onChange={(e) => setImportName(e.target.value)}
+                        maxLength={28}
+                        placeholder={t.quickNamePlaceholder}
+                        className="w-full border border-[var(--border-hairline)] bg-[var(--surface-inset)] px-3 py-2 text-xs text-[var(--text-main)] placeholder-[var(--placeholder-ink)] outline-none focus:border-[var(--vice-blue)]"
+                      />
+
+                      <label className="flex flex-col items-center justify-center gap-2 border border-dashed border-[var(--border-strong)] bg-[var(--surface-inset)]/75 px-4 py-5 text-center transition-colors hover:border-[var(--vice-blue)] cursor-pointer">
+                        <Upload className="h-4 w-4 text-[var(--vice-blue)]" />
+                        <span className="text-xs font-semibold text-[var(--text-main)]">
+                          {t.ytDropLabel}
+                        </span>
+                        <input
+                          type="file"
+                          accept=".json,application/json"
+                          multiple
+                          onChange={(e) => handleFileImport(e.target.files, 'youtube')}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {importStatus && (
+                        <p className="font-mono-dial text-[11px] text-[var(--vice-blue)]">
+                          {importStatus}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

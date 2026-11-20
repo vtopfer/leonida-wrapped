@@ -4,6 +4,7 @@ export const APP_CONFIG = {
   siteName: 'LEONIDA WRAPPED',
   siteUrl: 'leonidawrapped.com',
   defaultLastfmApiKey: (import.meta.env.VITE_LASTFM_API_KEY as string | undefined)?.trim() ?? '',
+  youtubeApiKey: (import.meta.env.VITE_YOUTUBE_API_KEY as string | undefined)?.trim() ?? '',
   livepixUrl: (import.meta.env.VITE_LIVEPIX_URL as string | undefined)?.trim() ?? '',
   kofiUrl: (import.meta.env.VITE_KOFI_URL as string | undefined)?.trim() ?? '',
   pixKey: (import.meta.env.VITE_PIX_KEY as string | undefined)?.trim() ?? '',
