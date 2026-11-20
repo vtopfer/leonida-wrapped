@@ -11,7 +11,7 @@ function escapeHtml(text: string): string {
     .replace(/'/g, '&#39;');
 }
 
-export async function onRequestGet(context: { request: Request }): Promise<Response> {
+export async function onRequest(context: { request: Request }): Promise<Response> {
   const url = new URL(context.request.url);
   const token = url.searchParams.get('r') ?? '';
   const payload = token ? decodeSharedProfile(token) : null;
