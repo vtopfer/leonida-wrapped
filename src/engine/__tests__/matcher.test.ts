@@ -121,7 +121,7 @@ describe('GTA VI Radio Matching Engine', () => {
     expect(highlights.topTracks).toHaveLength(3);
     const trackTitles = highlights.topTracks.map((t) => t.title);
     expect(trackTitles).toContain('Around the World');
-    expect(trackTitles).toContain('LUNCH');
+    expect(trackTitles).toContain('Lunch');
   });
 
   it('evaluates Mendes, Lu, and John Easter Egg profiles with expected multi-period shifts', () => {

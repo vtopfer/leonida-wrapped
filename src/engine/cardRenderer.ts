@@ -1,6 +1,7 @@
 import { APP_CONFIG } from '../config';
 import { STATION_BY_ID } from '../data/gta6Radios';
 import type { ComparisonResult, Language, PeriodMatchResult } from '../types';
+import { STATION_PNG_IDS } from '../components/StationArtwork';
 import { getStationArtworkDataUri } from './stationSvg';
 
 export type CardFormat = 'stories' | 'feed' | 'blend';
@@ -137,8 +138,19 @@ function loadStationArtworkImage(stationId: string): Promise<HTMLImageElement | 
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = getStationArtworkDataUri(stationId);
+    img.onerror = () => {
+      if (STATION_PNG_IDS.has(stationId)) {
+        const fallback = new Image();
+        fallback.onload = () => resolve(fallback);
+        fallback.onerror = () => resolve(null);
+        fallback.src = getStationArtworkDataUri(stationId);
+      } else {
+        resolve(null);
+      }
+    };
+    img.src = STATION_PNG_IDS.has(stationId)
+      ? `/stations/${stationId}.png`
+      : getStationArtworkDataUri(stationId);
   });
 }
 
