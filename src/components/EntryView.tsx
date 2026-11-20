@@ -5,7 +5,6 @@ import {
   HelpCircle,
   KeyRound,
   Radio,
-  Sparkles,
   Upload,
   Users,
   X,
@@ -17,7 +16,6 @@ import {
   hasUserCustomLastfmKey,
   saveUserLastfmApiKey,
 } from '../config';
-import { DEMO_PROFILES } from '../data/demoProfiles';
 import { STATION_BY_INDEX } from '../data/gta6Radios';
 import { TRANSLATIONS } from '../i18n/translations';
 import { LastfmServiceError, fetchLastfmProfile } from '../services/lastfm';
@@ -208,39 +206,6 @@ export function EntryView({
             <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[var(--text-muted)]">
               {t.heroLead}
             </p>
-          </div>
-
-          {/* Mendes, Lu & John Easter Egg Profiles */}
-          <div className="border border-[var(--border-hairline)] bg-[var(--surface)]/90 p-3.5 space-y-2.5">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--vice-blue)]" />
-              <span className="font-mono-dial text-[10px] tracking-wider text-[var(--vice-peach)] uppercase">
-                {t.demoSectionTitle}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2">
-              {DEMO_PROFILES.map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={() =>
-                    onComplete({
-                      ...preset.data,
-                      talkVibe: talkVibe ?? preset.data.talkVibe,
-                    })
-                  }
-                  className="group border border-[var(--border-hairline)] bg-[var(--surface-inset)]/85 px-3 py-2 text-left transition-colors hover:border-[var(--vice-pink)] cursor-pointer"
-                >
-                  <p className="text-xs font-bold text-[var(--text-main)] group-hover:text-[var(--vice-pink)]">
-                    {lang === 'pt' ? preset.labelPt : preset.labelEn}
-                  </p>
-                  <p className="mt-0.5 text-[11px] text-[var(--text-muted)] leading-snug">
-                    {lang === 'pt' ? preset.subtitlePt : preset.subtitleEn}
-                  </p>
-                </button>
-              ))}
-            </div>
           </div>
         </div>
 
