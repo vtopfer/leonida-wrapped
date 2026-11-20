@@ -68,8 +68,8 @@ export function ResultsDashboard({
     if (!compareUrl) return;
     const text =
       lang === 'pt'
-        ? `Minha rádio oficial em Leonida (GTA VI) é ${top.station.name} (${top.station.frequency}) — ${top.percentage}% de match! 🌴📻 Descubra a sua e compare comigo:`
-        : `My official GTA VI radio station in Leonida is ${top.station.name} (${top.station.frequency}) — ${top.percentage}% match! 🌴📻 Find yours and compare:`;
+        ? `Minha rádio oficial em Leonida (GTA VI) é ${top.station.name} (${top.station.frequency}) — ${top.percentage}% de match! 🌴📻 Descubra a sua e compare comigo:\n\n#wrapped #gtavi #gta6 #leonidawrapped`
+        : `My official GTA VI radio station in Leonida is ${top.station.name} (${top.station.frequency}) — ${top.percentage}% match! 🌴📻 Find yours and compare:\n\n#wrapped #gtavi #gta6 #leonidawrapped`;
     const intent = new URL('https://twitter.com/intent/tweet');
     intent.searchParams.set('text', text);
     intent.searchParams.set('url', compareUrl);
